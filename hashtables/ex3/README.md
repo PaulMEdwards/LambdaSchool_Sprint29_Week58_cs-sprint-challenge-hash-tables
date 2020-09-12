@@ -20,7 +20,7 @@ in all lists.
 
 From the above input, the return value will be:
 
-```
+```python
 [1, 2]
 ```
 

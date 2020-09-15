@@ -1,6 +1,6 @@
-debug = True
+debug = False
+writeFiles = False
 
-from hashtable import HashTable
 
 def finder(files, queries):
     """
@@ -12,48 +12,66 @@ def finder(files, queries):
     if debug:
         print(f"#  files={lf}")
         print(f"#queries={lq}")
-    data = HashTable(lq)
+    data = {}
 
-    if debug: print() # blank line
+    if debug or writeFiles: print() # blank line
 
     fd = 'files.txt'
     with open (fd, 'w') as filesOutput:
-        filesOutput.truncate(0)
+        if writeFiles: filesOutput.truncate(0)
         for f in files:
             t = f.split('/')
             last = t[len(t)-1]
-            data.put(last, f)
-            if debug: filesOutput.write(f"{f}\n")
-    if debug: print(f"Wrote files data to '{fd}'...")
+            if debug: print(f"file:\t{last}")
+            test = None
+            try:
+                test = data[last]
+            except:
+                pass
+            if debug: print(f"test 0:\t{test}")
+            if test is None:
+                data[last] = [f]
+            if test is not None:
+                tl = len(test)
+                if tl == 0:
+                    data[last] = [f]
+                elif tl > 0:
+                    data[last].append(f)
+            if debug: print(f"test 1:\t{data[last]}")
+            if writeFiles: filesOutput.write(f"{f}\n")
+    if writeFiles: print(f"Wrote files data to '{fd}'...")
     filesOutput.close()
 
     fq = 'queries.txt'
     with open (fq, 'w') as queriesOutput:
-        queriesOutput.truncate(0)
+        if writeFiles: queriesOutput.truncate(0)
         for q in queries:
-            if debug: queriesOutput.write(f"{q}\n")
+            if writeFiles: queriesOutput.write(f"{q}\n")
             test = None
             try:
-                test = data.get(q)
+                test = data[q]
                 if debug and test is not None: print(f"query: {q}, result: {test}")
             except:
                 pass
             if test is not None:
-                result.append(test)
-    if debug: print(f"Wrote queries data to '{fq}'...")
+                tl = len(test)
+                if tl > 0:
+                    for t in test:
+                        result.append(t)
+    if writeFiles: print(f"Wrote queries data to '{fq}'...")
     queriesOutput.close()
 
-    if debug:
-        fh = 'ht.txt'
-        with open (fh, 'w') as filesHashTable:
-            filesHashTable.truncate(0)
-            print(data, file=filesHashTable)
-        filesHashTable.close()
-        print(f"Wrote HashTable data to '{fh}'...")
+    if writeFiles:
+        fd = 'dict.txt'
+        with open (fd, 'w') as filesDict:
+            filesDict.truncate(0)
+            print(data, file=filesDict)
+        filesDict.close()
+        print(f"Wrote Dictionary data to '{fd}'...")
 
-    if debug: print() # blank line
+    if debug or writeFiles: print() # blank line
 
-    if debug: print(f"result:\t{result}")
+    if debug or writeFiles: print(f"result:\t{result}")
     return result
 
 
